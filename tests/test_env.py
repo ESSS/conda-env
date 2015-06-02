@@ -2,7 +2,6 @@ from collections import OrderedDict
 import os
 import sys
 import random
-import textwrap
 import unittest
 import yaml
 

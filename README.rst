@@ -85,7 +85,7 @@ to most ``conda`` commands, and is like ``defaults`` in the ``.condarc``
 channel configuration but with the reverse logic.
 
 Environment file example
------------------------
+------------------------
 
 .. code-block:: yaml
 
@@ -102,3 +102,25 @@ Environment file example
         - Flask-Testing
 
 **Recommendation:** Always create your `environment.yml` file by hand.
+
+``environment.yml`` with environment and aliases
+------------------------------------------------
+
+.. code-block:: yaml
+
+    name: oracle
+    dependencies:
+      - oracle_instantclient
+
+    # List type environment variables will be joined with os.pathsep (':' in unix, ';' in windows).
+    # These values will be inserted in front of any existing value in the current environment.
+    # e.g.:
+    #   current PATH: "/usr/local/bin:/usr/bin"
+    #   new     PATH: "{{ root }}/bin:/usr/local/bin:/usr/bin"
+    environment:
+      - ORACLE_HOME: /usr/local/oracle_instantclient
+      - PATH:
+        - {{ root }}/bin
+
+    aliases:
+      run_db: bash {{ root }}/bin/run_db.sh
