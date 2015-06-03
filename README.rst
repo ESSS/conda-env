@@ -132,8 +132,8 @@ following variables:
 - ``root``: The directory containing ``environment.yml``
 - ``os``: Python's ``os`` module.
 
-``environment.yml`` with aliases
---------------------------------
+``environment.yml`` with environment and aliases
+------------------------------------------------
 
 .. code-block:: yaml
 
@@ -147,8 +147,8 @@ following variables:
     #   current PATH: "/usr/local/bin:/usr/bin"
     #   new     PATH: "{{ root }}/bin:/usr/local/bin:/usr/bin"
     environment:
-      ORACLE_HOME: /usr/local/oracle_instantclient
-      PATH:
+      - ORACLE_HOME: /usr/local/oracle_instantclient
+      - PATH:
         - {{ root }}/bin
 
     aliases:
