@@ -103,6 +103,40 @@ Environment file example
 
 **Recommendation:** Always create your `environment.yml` file by hand.
 
+``environment.yml`` jinja2 rendering
+------------------------------------
+
+If you have ``jinja2`` available in the environment, ``environment.yml`` files will be
+rendered with it before processing.
+
+.. code-block:: yaml
+
+    name: pytest
+    dependencies:
+    {% for i in ['xunit', 'coverage','mock'] %}
+      - pytest-{{ i }}
+    {% endfor %}
+
+In this example, the previous file with ``jinja2`` syntax is equivalent to:
+
+.. code-block:: yaml
+
+    name: pytest
+    dependencies:
+      - pytest-xunit
+      - pytest-coverage
+      - pytest-mock
+
+
+Available variables
+^^^^^^^^^^^^^^^^^^^
+
+When using ``jinja2``, on top of the usual template capabilities, you have access to the
+following variables:
+
+- ``root``: The directory containing ``environment.yml``
+- ``os``: Python's ``os`` module.
+
 ``environment.yml`` with environment and aliases
 ------------------------------------------------
 
