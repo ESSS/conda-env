@@ -34,7 +34,7 @@ class from_file_TestCase(unittest.TestCase):
 
     def test_retains_full_filename(self):
         e = get_simple_environment()
-        self.assertEqual(utils.support_file('simple.yml'), e.filename)
+        self.assertEqual(os.path.abspath(utils.support_file('simple.yml')), e.filename)
 
     def test_with_pip(self):
         e = env.from_file(utils.support_file('with-pip.yml'))
@@ -46,6 +46,55 @@ class from_file_TestCase(unittest.TestCase):
         e = env.from_file(utils.support_file('with-jinja.yml'))
         self.assertEqual(e.dependencies.raw, ['pytest-xunit', 'pytest-coverage', 'pytest-mock'])
         self.assertEqual(e.environment['PYTHON_DIR'], os.path.abspath(utils.support_file('python')))
+
+    def test_include(self):
+        e = env.from_file(utils.support_file('include/c.yml'))
+        self.assertEqual(
+            e.dependencies.raw,
+            [
+                'a_dependency',
+                {'pip': ['a_pip_dependency']},
+                'b_dependency',
+                {'pip': ['b_pip_dependency']},
+            ]
+        )
+        self.assertEqual(
+            e.dependencies,
+            {
+                'conda' : ['a_dependency', 'b_dependency'],
+                'pip' : ['a_pip_dependency', 'b_pip_dependency'],
+            }
+        )
+        self.assertEqual(e.to_dict(), {
+            'name' : 'c',
+            'aliases' : {'a_alias' : 'xargs', 'overridden_alias' : 'b_value'},
+            'environment' : [
+                {'PATH' : ['a_path']},
+                {'PATH' : ['b_path']},
+            ],
+            'channels' : ['b_channel', 'c_channel'],
+            'dependencies' : [
+                'a_dependency',
+                {'pip': ['a_pip_dependency']},
+                'b_dependency',
+                {'pip': ['b_pip_dependency']},
+            ],
+        })
+
+
+    def test_include_recursive(self):
+        '''Make sure we don't get a recursion error if B includes A which includes B
+        In this case, we just ignore the 'include B' directive, since it is already included.
+        '''
+        e = env.from_file(utils.support_file('include_recursive/b.yml'))
+        self.assertEqual(e.to_dict(), {
+            'name' : 'b',
+            'dependencies' : [
+                'a_dependency',
+                'b_dependency',
+            ],
+        })
+
 
 
 class EnvironmentTestCase(unittest.TestCase):

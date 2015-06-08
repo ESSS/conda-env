@@ -1,0 +1,14 @@
+name: b
+dependencies:
+  - b_dependency
+  - pip:
+    - b_pip_dependency
+channels:
+  - b_channel
+environment:
+  - PATH:
+    - b_path
+aliases:
+  overridden_alias: b_value
+includes:
+  - {{ root }}/a.yml

@@ -11,7 +11,7 @@ from . import utils
 
 
 class activate_deactivate_TestCase(unittest.TestCase):
-    _ENV = env.Environment(environment={'FOO' : 'BAR'}, aliases={'my_ls' : 'ls -la'})
+    _ENV = env.Environment(environment=[{'FOO' : 'BAR'}], aliases={'my_ls' : 'ls -la'})
     _CONDA_DIR = utils.support_file('conda')
     _PREFIX = os.path.join(_CONDA_DIR, 'envs', 'test_write_activate_deactivate')
     _OBTAINED_PRINT_ENV = os.path.join(_PREFIX, 'etc', 'conda', 'print_env.py')
@@ -31,7 +31,7 @@ class activate_deactivate_TestCase(unittest.TestCase):
             with open(os.path.join(self._PREFIX, 'etc', 'conda', 'activate.d', '_activate.sh')) as activate:
                 self.assertEqual(activate.read(), textwrap.dedent(
                     '''
-                    python "%s" activate "{\'FOO\': \'BAR\'}" "{\'my_ls\': \'ls -la\'}" > _tmp_activate.sh
+                    python "%s" activate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > _tmp_activate.sh
                     source _tmp_activate.sh
                     rm _tmp_activate.sh
                     '''
@@ -40,7 +40,7 @@ class activate_deactivate_TestCase(unittest.TestCase):
             with open(os.path.join(self._PREFIX, 'etc', 'conda', 'deactivate.d', '_deactivate.sh')) as deactivate:
                 self.assertEqual(deactivate.read(), textwrap.dedent(
                     '''
-                    python "%s" deactivate "{\'FOO\': \'BAR\'}" "{\'my_ls\': \'ls -la\'}" > _tmp_deactivate.sh
+                    python "%s" deactivate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > _tmp_deactivate.sh
                     source _tmp_deactivate.sh
                     rm _tmp_deactivate.sh
                     '''
@@ -61,7 +61,7 @@ class activate_deactivate_TestCase(unittest.TestCase):
             with open(os.path.join(self._PREFIX, 'etc', 'conda', 'activate.d', '_activate.bat')) as activate:
                 self.assertEqual(activate.read(), textwrap.dedent(
                     '''
-                    python "%s" activate "{\'FOO\': \'BAR\'}" "{\'my_ls\': \'ls -la\'}" > _tmp_activate.bat
+                    python "%s" activate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > _tmp_activate.bat
                     call _tmp_activate.bat
                     del _tmp_activate.bat
                     '''
@@ -70,7 +70,7 @@ class activate_deactivate_TestCase(unittest.TestCase):
             with open(os.path.join(self._PREFIX, 'etc', 'conda', 'deactivate.d', '_deactivate.bat')) as deactivate:
                 self.assertEqual(deactivate.read(), textwrap.dedent(
                     '''
-                    python "%s" deactivate "{\'FOO\': \'BAR\'}" "{\'my_ls\': \'ls -la\'}" > _tmp_deactivate.bat
+                    python "%s" deactivate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > _tmp_deactivate.bat
                     call _tmp_deactivate.bat
                     del _tmp_deactivate.bat
                     '''

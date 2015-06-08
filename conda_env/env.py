@@ -86,11 +86,11 @@ def from_yaml(yamlstr, **kwargs):
     return Environment(**data)
 
 
-def from_file(filename):
+def from_file(filename, **kwargs):
     if not os.path.exists(filename):
         raise exceptions.EnvironmentFileNotFound(filename)
     with open(filename, 'rb') as fp:
-        return from_yaml(fp.read(), filename=filename)
+        return from_yaml(fp.read(), filename=os.path.abspath(filename), **kwargs)
 
 
 # TODO test explicitly
@@ -107,8 +107,10 @@ class Dependencies(OrderedDict):
         self.update({'conda': []})
 
         for line in self.raw:
-            if isinstance(line, dict):
-                self.update(line)
+            if type(line) is dict:
+                installer = line.keys()[0]
+                dependencies = line[installer]
+                self[installer] = self.get(installer, []) + dependencies
             else:
                 self['conda'].append(common.arg2spec(line))
 
@@ -117,16 +119,43 @@ class Dependencies(OrderedDict):
         self.raw.append(package_name)
         self.parse()
 
+    def include(self, other):
+        # Insert included dependencies in front of self's to maintain order.
+        self.raw = other.raw + self.raw
+        self.parse()
+
 
 class Environment(object):
     def __init__(self, name=None, filename=None, channels=None,
-                 dependencies=None, environment=None, aliases=None):
+                 dependencies=None, environment=None, aliases=None,
+                 includes=None, _included_files=None):
         self.name = name
         self.filename = filename
-        self.dependencies = Dependencies(dependencies)
+        self.dependencies = Dependencies(dependencies or [])
         self.channels = channels or []
-        self.environment = environment or {}
+        self.environment = environment or []
         self.aliases = aliases or {}
+        self.includes = includes or []
+
+        # Internal field kept to avoid recursion errors.
+        self._included_files = _included_files or []
+
+        self._included_files.append(self.filename)
+        for included_file in self.includes:
+            if os.path.abspath(included_file) in self._included_files:
+                continue
+
+            # Insert every included field in front of self's to maintain order.
+            included_env = from_file(included_file, _included_files=self._included_files)
+            self.dependencies.include(included_env.dependencies)
+            self.channels = included_env.channels + self.channels
+            self.environment = included_env.environment + self.environment
+
+            aliases = included_env.aliases.copy()
+            aliases.update(self.aliases)
+            self.aliases = aliases
+
+            self._included_files = included_env._included_files + self._included_files
 
     def to_dict(self):
         d = yaml.dict([('name', self.name)])
