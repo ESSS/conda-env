@@ -11,7 +11,7 @@ from . import utils
 
 
 class activate_deactivate_TestCase(unittest.TestCase):
-    _ENV = env.Environment(environment={'FOO' : 'BAR'}, aliases={'my_ls' : 'ls -la'})
+    _ENV = env.Environment(environment=[{'FOO' : 'BAR'}], aliases={'my_ls' : 'ls -la'})
     _CONDA_DIR = utils.support_file('conda')
     _PREFIX = os.path.join(_CONDA_DIR, 'envs', 'test_write_activate_deactivate')
     _OBTAINED_PRINT_ENV = os.path.join(_PREFIX, 'etc', 'conda', 'print_env.py')
@@ -32,7 +32,7 @@ class activate_deactivate_TestCase(unittest.TestCase):
                 self.assertEqual(activate.read(), textwrap.dedent(
                     '''
                     TEMP_FILE=`python -c "import tempfile; print(tempfile.mkstemp(suffix=\\".sh\\")[1])"`
-                    python "%s" activate "{'FOO': 'BAR'}" "{'my_ls': 'ls -la'}" > $TEMP_FILE
+                    python "%s" activate "[{'FOO': 'BAR'}]" "{'my_ls': 'ls -la'}" > $TEMP_FILE
                     source $TEMP_FILE
                     rm $TEMP_FILE
                     '''
@@ -42,7 +42,7 @@ class activate_deactivate_TestCase(unittest.TestCase):
                 self.assertEqual(deactivate.read(), textwrap.dedent(
                     '''
                     TEMP_FILE=`python -c "import tempfile; print(tempfile.mkstemp(suffix=\\".sh\\")[1])"`
-                    python "%s" deactivate "{'FOO': 'BAR'}" "{'my_ls': 'ls -la'}" > $TEMP_FILE
+                    python "%s" deactivate "[{'FOO': 'BAR'}]" "{'my_ls': 'ls -la'}" > $TEMP_FILE
                     source $TEMP_FILE
                     rm $TEMP_FILE
                     '''
@@ -68,7 +68,7 @@ class activate_deactivate_TestCase(unittest.TestCase):
                     '''
                     set TEMP_FILE=
                     for /f "delims=" %%%%A in ('python -c "import tempfile; print(tempfile.mkstemp(suffix=\\".bat\\")[1])"') do @set TEMP_FILE=%%%%A
-                    python "%s" activate "{'FOO': 'BAR'}" "{'my_ls': 'ls -la'}" > %%TEMP_FILE%%
+                    python "%s" activate "[{'FOO': 'BAR'}]" "{'my_ls': 'ls -la'}" > %%TEMP_FILE%%
                     call %%TEMP_FILE%%
                     del %%TEMP_FILE%%
                     '''
@@ -79,7 +79,7 @@ class activate_deactivate_TestCase(unittest.TestCase):
                     '''
                     set TEMP_FILE=
                     for /f "delims=" %%%%A in ('python -c "import tempfile; print(tempfile.mkstemp(suffix=\\".bat\\")[1])"') do @set TEMP_FILE=%%%%A
-                    python "%s" deactivate "{'FOO': 'BAR'}" "{'my_ls': 'ls -la'}" > %%TEMP_FILE%%
+                    python "%s" deactivate "[{'FOO': 'BAR'}]" "{'my_ls': 'ls -la'}" > %%TEMP_FILE%%
                     call %%TEMP_FILE%%
                     del %%TEMP_FILE%%
                     '''
