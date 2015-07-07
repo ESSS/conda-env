@@ -31,18 +31,20 @@ class activate_deactivate_TestCase(unittest.TestCase):
             with open(os.path.join(self._PREFIX, 'etc', 'conda', 'activate.d', '_activate.sh')) as activate:
                 self.assertEqual(activate.read(), textwrap.dedent(
                     '''
-                    python "%s" activate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > _tmp_activate.sh
-                    source _tmp_activate.sh
-                    rm _tmp_activate.sh
+                    TEMP_FILE=`python -c "import tempfile; print(tempfile.mkstemp(suffix=\\".sh\\")[1])"`
+                    python "%s" activate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > $TEMP_FILE
+                    source $TEMP_FILE
+                    rm $TEMP_FILE
                     '''
                 ).lstrip() % self._OBTAINED_PRINT_ENV)
 
             with open(os.path.join(self._PREFIX, 'etc', 'conda', 'deactivate.d', '_deactivate.sh')) as deactivate:
                 self.assertEqual(deactivate.read(), textwrap.dedent(
                     '''
-                    python "%s" deactivate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > _tmp_deactivate.sh
-                    source _tmp_deactivate.sh
-                    rm _tmp_deactivate.sh
+                    TEMP_FILE=`python -c "import tempfile; print(tempfile.mkstemp(suffix=\\".sh\\")[1])"`
+                    python "%s" deactivate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > $TEMP_FILE
+                    source $TEMP_FILE
+                    rm $TEMP_FILE
                     '''
                 ).lstrip() % self._OBTAINED_PRINT_ENV)
 
@@ -55,24 +57,31 @@ class activate_deactivate_TestCase(unittest.TestCase):
 
 
     def test_write_activate_deactivate_win(self):
+        if sys.platform != 'win32':
+            return
+
         try:
             write_activate_deactivate(self._ENV, self._PREFIX)
 
             with open(os.path.join(self._PREFIX, 'etc', 'conda', 'activate.d', '_activate.bat')) as activate:
                 self.assertEqual(activate.read(), textwrap.dedent(
                     '''
-                    python "%s" activate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > _tmp_activate.bat
-                    call _tmp_activate.bat
-                    del _tmp_activate.bat
+                    set TEMP_FILE=
+                    for /f "delims=" %%%%A in (\'python -c "import tempfile; print(tempfile.mkstemp(suffix=\\".bat\\")[1])"\') do @set TEMP_FILE=%%%%A
+                    python "%s" activate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > %%TEMP_FILE%%
+                    call %%TEMP_FILE%%
+                    del %%TEMP_FILE%%
                     '''
                 ).lstrip() % self._OBTAINED_PRINT_ENV)
 
             with open(os.path.join(self._PREFIX, 'etc', 'conda', 'deactivate.d', '_deactivate.bat')) as deactivate:
                 self.assertEqual(deactivate.read(), textwrap.dedent(
                     '''
-                    python "%s" deactivate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > _tmp_deactivate.bat
-                    call _tmp_deactivate.bat
-                    del _tmp_deactivate.bat
+                    set TEMP_FILE=
+                    for /f "delims=" %%%%A in (\'python -c "import tempfile; print(tempfile.mkstemp(suffix=\\".bat\\")[1])"\') do @set TEMP_FILE=%%%%A
+                    python "%s" deactivate "[{\'FOO\': \'BAR\'}]" "{\'my_ls\': \'ls -la\'}" > %%TEMP_FILE%%
+                    call %%TEMP_FILE%%
+                    del %%TEMP_FILE%%
                     '''
                 ).lstrip() % self._OBTAINED_PRINT_ENV)
 

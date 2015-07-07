@@ -142,19 +142,28 @@ def write_activate_deactivate(env, prefix):
         ext = '.bat'
         source = 'call'
         rm = 'del'
+        set_temp_file = '''set TEMP_FILE=\nfor /f "delims=" %%%%A in ('%s') do @set TEMP_FILE=%%%%A'''
+        temp_file = '%TEMP_FILE%'
     else:
         ext = '.sh'
         source = 'source'
         rm = 'rm'
+        set_temp_file = 'TEMP_FILE=`%s`'
+        temp_file = '$TEMP_FILE'
+
+    python_create_temp_file = 'python -c "import tempfile; print(tempfile.mkstemp(suffix=\\"%s\\")[1])"' % ext
+    set_temp_file = set_temp_file % python_create_temp_file
 
     with open(os.path.join(activate_dir, '_activate' + ext), 'w') as activate:
-        activate.write('python "%s" activate "%s" "%s" > _tmp_activate%s\n' % \
-            (os.path.join(conda_dir, 'print_env.py'), repr(env.environment), repr(env.aliases), ext))
-        activate.write(source + ' _tmp_activate%s\n' % ext)
-        activate.write(rm + ' _tmp_activate%s\n' % ext)
+        activate.write('%s\n' % set_temp_file)
+        activate.write('python "%s" activate "%s" "%s" > %s\n' % \
+            (os.path.join(conda_dir, 'print_env.py'), repr(env.environment), repr(env.aliases), temp_file))
+        activate.write(source + ' %s\n' % temp_file)
+        activate.write(rm + ' %s\n' % temp_file)
 
     with open(os.path.join(deactivate_dir, '_deactivate' + ext), 'w') as deactivate:
-        deactivate.write('python "%s" deactivate "%s" "%s" > _tmp_deactivate%s\n' % \
-            (os.path.join(conda_dir, 'print_env.py'), repr(env.environment), repr(env.aliases), ext))
-        deactivate.write(source + ' _tmp_deactivate%s\n' % ext)
-        deactivate.write(rm + ' _tmp_deactivate%s\n' % ext)
+        deactivate.write('%s\n' % set_temp_file)
+        deactivate.write('python "%s" deactivate "%s" "%s" > %s\n' % \
+            (os.path.join(conda_dir, 'print_env.py'), repr(env.environment), repr(env.aliases), temp_file))
+        deactivate.write(source + ' %s\n' % temp_file)
+        deactivate.write(rm + ' %s\n' % temp_file)
