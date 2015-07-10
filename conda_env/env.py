@@ -155,7 +155,7 @@ class Environment(object):
             aliases.update(self.aliases)
             self.aliases = aliases
 
-            self._included_files = included_env._included_files + self._included_files
+            self._included_files = list(OrderedDict.fromkeys(included_env._included_files + self._included_files))
 
     def to_dict(self):
         d = yaml.dict([('name', self.name)])
