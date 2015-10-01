@@ -5,7 +5,7 @@ import textwrap
 import unittest
 
 from conda_env import env
-from conda_env.cli.main_create import write_activate_deactivate
+from conda_env.etc_conda_scripts import write_activate_deactivate
 
 from . import utils
 
