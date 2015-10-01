@@ -108,9 +108,8 @@ class Dependencies(OrderedDict):
 
         for line in self.raw:
             if type(line) is dict:
-                installer = line.keys()[0]
-                dependencies = line[installer]
-                self[installer] = self.get(installer, []) + dependencies
+                for installer, dependencies in line.items():
+                    self[installer] = self.get(installer, []) + dependencies
             else:
                 self['conda'].append(common.arg2spec(line))
 
