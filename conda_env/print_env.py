@@ -71,6 +71,14 @@ def print_env(action, environment=[], aliases={}):
         def Unalias(name):
             return 'unalias %(name)s\n' % locals()
 
+    else:
+        error_msg = [
+            'Could not determine shell from environment variables {SHELL, COMSPEC}',
+            'This is an unknown shell: %(shell)s' % locals(),
+        ]
+        raise RuntimeError('\n'.join(error_msg))
+
+
     # Activate/Deactivate
     if action == 'activate':
         s = ''
