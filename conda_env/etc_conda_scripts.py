@@ -20,7 +20,7 @@ def write_activate_deactivate(env, prefix):
     # Copy print_env.py
     import shutil
     shutil.copyfile(
-        os.path.join(os.path.dirname(__file__), '..', 'print_env.py'),
+        os.path.join(os.path.dirname(__file__), 'print_env.py'),
         os.path.join(conda_dir, 'print_env.py'),
     )
 
