@@ -26,7 +26,7 @@ def print_env(action, environment=[], aliases={}):
                 env[k] += v
             else:
                 env[k] = v
-
+    # TODO: Use a more robust shell detection.
     # Create environment configuration functions
     if shell == 'bash':
         def Export(name, value):
@@ -41,9 +41,8 @@ def print_env(action, environment=[], aliases={}):
             return 'alias %(name)s="%(value)s"\n' % locals()
         def Unalias(name):
             return '[ `alias | grep %(name)s= | wc -l` != 0 ] && unalias %(name)s\n' % locals()
-        
 
-    elif shell == 'cmd.exe':
+    elif 'cmd.exe' in shell:
         def Export(name, value):
             if isinstance(value, list):
                 value = pathsep.join(value)
@@ -57,7 +56,7 @@ def print_env(action, environment=[], aliases={}):
         def Unalias(name):
             return 'doskey %(name)s=\n' % locals()
 
-    elif shell == 'tcc.exe':
+    elif 'tcc.exe' in shell:
         def Export(name, value):
             if isinstance(value, list):
                 value = pathsep.join(value)
