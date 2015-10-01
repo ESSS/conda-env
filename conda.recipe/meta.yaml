@@ -4,7 +4,7 @@ package:
 
 build:
   number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
-  string: esss
+  string: esss_1
   preserve_egg_dir: yes
   always_include_files:
     - bin/activate              [unix]
