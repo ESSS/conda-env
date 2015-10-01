@@ -89,7 +89,7 @@ def from_yaml(yamlstr, **kwargs):
 def from_file(filename, **kwargs):
     if not os.path.exists(filename):
         raise exceptions.EnvironmentFileNotFound(filename)
-    with open(filename, 'rb') as fp:
+    with open(filename) as fp:
         return from_yaml(fp.read(), filename=os.path.abspath(filename), **kwargs)
 
 
