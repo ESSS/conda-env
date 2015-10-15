@@ -16,7 +16,7 @@ def print_env(action, environment=[], aliases={}):
         raise RuntimeError('Could not determine shell from environment variables {SHELL, COMSPEC}')
     shell = os.path.basename(shell).lower()
     pathsep = os.pathsep
-    
+
     # Join duplicated environment variables
     env = {}
     for env_dict in environment:
@@ -32,9 +32,9 @@ def print_env(action, environment=[], aliases={}):
         def Export(name, value):
             if isinstance(value, list):
                 value = pathsep.join(value)
-                return 'export %(name)s=%(value)s%(pathsep)s$%(name)s\n' % locals()
+                return 'export %(name)s="%(value)s%(pathsep)s$%(name)s"\n' % locals()
             else:
-                return 'export %(name)s=%(value)s\n' % locals()
+                return 'export %(name)s="%(value)s"\n' % locals()
         def Unset(name):
             return 'unset %(name)s\n' % locals()
         def Alias(name, value):

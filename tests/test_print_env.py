@@ -28,10 +28,10 @@ class EnvironmentAndAliasesTestCase(unittest.TestCase):
             activate = print_env('activate', self.ENVIRONMENT, self.ALIASES)
             assert activate == textwrap.dedent(
                 '''
-                export ANY_LIST_REALLY=something1:something2:$ANY_LIST_REALLY
-                export PATH=mypath1:mypath2:mypath3:$PATH
-                export SINGLE_INT=200
-                export SINGLE_VAR=single_value
+                export ANY_LIST_REALLY="something1:something2:$ANY_LIST_REALLY"
+                export PATH="mypath1:mypath2:mypath3:$PATH"
+                export SINGLE_INT="200"
+                export SINGLE_VAR="single_value"
                 alias my_ls="ls -la"
                 '''
             ).lstrip()
@@ -43,7 +43,7 @@ class EnvironmentAndAliasesTestCase(unittest.TestCase):
             assert deactivate == textwrap.dedent(
                 '''
                 unset ANY_LIST_REALLY
-                export PATH=/usr/bin:/usr/local/bin
+                export PATH="/usr/bin:/usr/local/bin"
                 unset SINGLE_VAR
                 [ `alias | grep my_ls= | wc -l` != 0 ] && unalias my_ls
                 '''
