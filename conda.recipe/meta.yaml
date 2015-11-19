@@ -1,10 +1,10 @@
 package:
   name: conda-env
-  version: 2.4.5
+  version: 2.5.0esss
 
 build:
-  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
-  string: esss_2
+  number: 0
+  string: 0
   preserve_egg_dir: yes
   always_include_files:
     - bin/activate              [unix]
