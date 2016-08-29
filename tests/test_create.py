@@ -53,13 +53,16 @@ parser_config = {
 }
 
 
-def run_command(command, envs_dir, env_name, *arguments):
+def run_command(command, envs_dir, env_name, env_filename, *arguments):
     p = conda_argparse.ArgumentParser()
     sub_parsers = p.add_subparsers(metavar='command', dest='cmd')
     parser_config[command](sub_parsers)
 
     arguments = list(map(escape_for_winpath, arguments))
-    command_line = "{0} -n {1} -f {2}".format(command, env_name, " ".join(arguments))
+    command_line = "{0} -n {1} -f {2} {3}".format(command,
+                                                  env_name,
+                                                  env_filename,
+                                                  " ".join(arguments))
 
     args = p.parse_args(split(command_line))
     try:
@@ -108,11 +111,36 @@ class IntegrationTests(TestCase):
             prefix = join(envs_dir, env_name)
             python_path = join(prefix, PYTHON_BINARY)
 
-            run_command(Commands.CREATE, envs_dir, env_name, utils.support_file('example/environment_pinned.yml'))
+            run_command(Commands.CREATE,
+                        envs_dir,
+                        env_name,
+                        utils.support_file('example/environment_pinned.yml'))
             self.assertTrue(exists(python_path),
                             'Python file {} does not exist'.format(python_path))
             assert_package_is_installed(prefix, 'flask-0.9')
 
-            run_command(Commands.UPDATE, envs_dir, env_name, utils.support_file('example/environment_pinned_updated.yml'))
+            run_command(Commands.UPDATE,
+                        envs_dir,
+                        env_name,
+                        utils.support_file('example/environment_pinned_updated.yml'))
             assert_package_is_installed(prefix, 'flask-0.10')
             self.assertFalse(package_is_installed(prefix, 'flask-0.9'))
+
+
+    def test_update_prune(self):
+        with make_temp_envs_dir() as envs_dir:
+            env_name = 'test'
+            prefix = join(envs_dir, env_name)
+
+            run_command(Commands.CREATE,
+                        envs_dir,
+                        env_name,
+                        utils.support_file('example/environment_pinned.yml'))
+            assert_package_is_installed(prefix, 'decorator')
+
+            run_command(Commands.UPDATE,
+                        envs_dir,
+                        env_name,
+                        utils.support_file('example/environment_pinned_updated.yml'),
+                        '--prune')
+            self.assertFalse(package_is_installed(prefix, 'decorator'))

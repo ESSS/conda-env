@@ -1,3 +1,4 @@
 name: test
 dependencies:
   - flask==0.9
+  - decorator
